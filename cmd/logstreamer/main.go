@@ -7,7 +7,7 @@ import (
 	"syscall"
 
 	"github.com/Narvdeshwar/go-logstreamer/internal/config"
-	"golang.org/x/text/message/pipeline"
+	"github.com/Narvdeshwar/go-logstreamer/internal/pipeline"
 )
 
 func main() {
