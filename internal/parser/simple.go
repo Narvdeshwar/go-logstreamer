@@ -27,5 +27,6 @@ func (p *SimpleParser) Parse(line string) (*model.LogEntry, error) {
 		TimeStamp: ts,
 		Level:     parts[1],
 		Service:   parts[2],
+		Message:   parts[3],
 	}, nil
 }
