@@ -5,7 +5,9 @@ import (
 	"sync"
 
 	"github.com/Narvdeshwar/go-logstreamer/internal/config"
+	"github.com/Narvdeshwar/go-logstreamer/internal/parser"
 	"github.com/Narvdeshwar/go-logstreamer/internal/source"
+	"github.com/Narvdeshwar/go-logstreamer/pkg/model"
 )
 
 type Pipeline struct {
@@ -17,23 +19,49 @@ func New(cfg *config.Config) *Pipeline {
 }
 
 func (p *Pipeline) Run(ctx context.Context) {
-	rowChan := make(chan string, p.cfg.Buffer)
+	rawChan := make(chan string, p.cfg.Buffer)
+	parsedChan := make(chan model.LogEntry, p.cfg.Buffer)
 
-	var wg sync.WaitGroup
+	var srcWG sync.WaitGroup
+	var workerWG sync.WaitGroup
 	for _, file := range p.cfg.Files {
-		wg.Add(1)
+		srcWG.Add(1)
 		go func(path string) {
-			defer wg.Done()
+			defer srcWG.Done()
 			src := source.NewFileSource(path)
-			_ = src.Start(ctx, rowChan)
+			_ = src.Start(ctx, rawChan)
 		}(file)
 	}
 	go func() {
-		wg.Wait()
-		close(rowChan)
+		srcWG.Wait()
+		close(rawChan)
 	}()
-	for line := range rowChan {
-		_ = line
+	prsr := parser.NewSimpleParser()
+	for i := 0; i < p.cfg.Workers; i++ {
+		workerWG.Add(1)
+		go func() {
+			defer workerWG.Done()
+			for line := range rawChan {
+				entry, err := prsr.Parse(line)
+				if err == nil {
+					select {
+					case <-ctx.Done():
+						return
+					case parsedChan <- *entry:
+					}
+				}
+				_ = line
+			}
+		}()
 	}
-	<-ctx.Done()
+	go func ()  {
+		workerWG.Wait()
+		close(parsedChan)	
+	}()
+
+	for range parsedChan{
+
+	}
+
+	// <-ctx.Done()
 }
