@@ -2,6 +2,7 @@ package aggregator
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Narvdeshwar/go-logstreamer/pkg/model"
 )
@@ -32,5 +33,18 @@ func (a *Aggregator) Run(ctx context.Context, in <-chan model.LogEntry) {
 			a.levelCount[entry.Level]++
 			a.serviceCount[entry.Service]++
 		}
+	}
+}
+
+func (a *Aggregator) PrintSummary() {
+	fmt.Println("===== Log Summary =====")
+	fmt.Printf("Total lines:%d\n", a.totalLines)
+	fmt.Println("Logs by Level:")
+	for level, count := range a.levelCount {
+		fmt.Printf("%s, %d\n", level, count)
+	}
+	fmt.Println("Logs by Service:")
+	for level, count := range a.serviceCount {
+		fmt.Printf("%s, %d\n", level, count)
 	}
 }
