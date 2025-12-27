@@ -29,6 +29,7 @@ func Load() *Config {
 
 }
 func splitComma(s string) []string {
+	// log.Println("string file in config", s)
 	if s == " " {
 		return nil
 	}

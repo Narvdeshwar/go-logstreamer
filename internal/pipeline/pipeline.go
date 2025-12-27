@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/Narvdeshwar/go-logstreamer/internal/aggregator"
 	"github.com/Narvdeshwar/go-logstreamer/internal/config"
 	"github.com/Narvdeshwar/go-logstreamer/internal/parser"
 	"github.com/Narvdeshwar/go-logstreamer/internal/source"
@@ -54,14 +55,17 @@ func (p *Pipeline) Run(ctx context.Context) {
 			}
 		}()
 	}
-	go func ()  {
+	go func() {
 		workerWG.Wait()
-		close(parsedChan)	
+		close(parsedChan)
 	}()
+	agg := aggregator.NewAggregator()
+	agg.Run(ctx, parsedChan)
+	agg.PrintSummary()
 
-	for range parsedChan{
+	// for range parsedChan{
 
-	}
+	// }
 
 	// <-ctx.Done()
 }
