@@ -19,7 +19,7 @@ func (p *SimpleParser) Parse(line string) (*model.LogEntry, error) {
 	if len(parts) < 4 {
 		return nil, errors.New("Invalid log format")
 	}
-	ts, err := time.Parse("2025-01-02", parts[0])
+	ts, err := time.Parse("2006-01-02", parts[0])
 	if err != nil {
 		return nil, errors.New("Time format is incorrect!")
 	}
