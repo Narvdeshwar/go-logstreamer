@@ -7,6 +7,7 @@ import (
 
 	"github.com/Narvdeshwar/go-logstreamer/internal/aggregator"
 	"github.com/Narvdeshwar/go-logstreamer/internal/config"
+	"github.com/Narvdeshwar/go-logstreamer/internal/output"
 	"github.com/Narvdeshwar/go-logstreamer/internal/parser"
 	"github.com/Narvdeshwar/go-logstreamer/internal/source"
 	"github.com/Narvdeshwar/go-logstreamer/pkg/model"
@@ -80,6 +81,19 @@ func (p *Pipeline) Run(ctx context.Context) {
 	}()
 	<-aggDone
 	agg.PrintSummary()
+	if p.cfg.Output != "" {
+		err := output.WriteJSON(p.cfg.Output, agg.Summary())
+		if err != nil {
+			p.log.Error().
+				Err(err).
+				Str("output", p.cfg.Output).
+				Msg("failed to write JSON summary")
+		} else {
+			p.log.Info().
+				Str("output", p.cfg.Output).
+				Msg("JSON summary written")
+		}
+	}
 	elapsed := time.Since(start)
 	summary := agg.Summary()
 	elapsedSec := elapsed.Seconds()

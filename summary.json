@@ -1,0 +1,15 @@
+{
+  "TotalLines": 1000,
+  "LevelCount": {
+    "DEBUG": 254,
+    "ERROR": 252,
+    "INFO": 259,
+    "WARN": 235
+  },
+  "ServiceCount": {
+    "auth-svc": 240,
+    "notification-svc": 268,
+    "order-svc": 227,
+    "payment-svc": 265
+  }
+}
