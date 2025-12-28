@@ -51,11 +51,12 @@ func (a *Aggregator) Run(ctx context.Context, in <-chan model.LogEntry) {
 }
 
 func (a *Aggregator) PrintSummary() {
+	summary := a.Summary()
 	fmt.Println()
 	printLine("=", 30)
 	fmt.Println("LOG STREAMER SUMMARY")
 	printLine("=", 30)
-	fmt.Printf("➤  Total Lines Processed: %d\n\n", a.totalLines)
+	fmt.Printf("➤  Total Lines Processed: %d\n\n", summary.TotalLines)
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', 0)
 	printSection := func(title string, data map[string]int) {
 		fmt.Fprintln(w, title+"\tCOUNT")
@@ -71,8 +72,8 @@ func (a *Aggregator) PrintSummary() {
 		}
 		fmt.Fprintln(w, "\t")
 	}
-	printSection("LOG LEVEL", a.levelCount)
-	printSection("SERVICE", a.serviceCount)
+	printSection("LOG LEVEL", summary.LevelCount)
+	printSection("SERVICE", summary.ServiceCount)
 	w.Flush()
 	printLine("=", 30)
 	fmt.Println()

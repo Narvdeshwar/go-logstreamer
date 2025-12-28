@@ -91,7 +91,7 @@ func (p *Pipeline) Run(ctx context.Context) {
 		} else {
 			p.log.Info().
 				Str("output", p.cfg.Output).
-				Msg("JSON summary written")
+				Msg("JSON summary written successfully")
 		}
 	}
 	elapsed := time.Since(start)

@@ -16,6 +16,5 @@ func WriteJSON(path string, summary model.Summary) error {
 
 	enc := json.NewEncoder(f)
 	enc.SetIndent("", "  ")
-
 	return enc.Encode(summary)
 }
