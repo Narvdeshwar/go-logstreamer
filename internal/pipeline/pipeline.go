@@ -2,7 +2,9 @@ package pipeline
 
 import (
 	"context"
+	"log"
 	"sync"
+	"time"
 
 	"github.com/Narvdeshwar/go-logstreamer/internal/aggregator"
 	"github.com/Narvdeshwar/go-logstreamer/internal/config"
@@ -69,6 +71,7 @@ func (p *Pipeline) Run(ctx context.Context) {
 		close(parsedChan)
 	}()
 	agg := aggregator.NewAggregator()
+	start := time.Now()
 	aggDone := make(chan struct{})
 	go func() {
 		agg.Run(ctx, parsedChan)
@@ -76,4 +79,6 @@ func (p *Pipeline) Run(ctx context.Context) {
 	}()
 	<-aggDone
 	agg.PrintSummary()
+	elapsed := time.Since(start)
+	log.Println("Time taken", elapsed)
 }
