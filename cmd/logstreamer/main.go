@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"runtime/pprof"
 	"syscall"
 
 	"github.com/Narvdeshwar/go-logstreamer/internal/config"
@@ -13,6 +14,18 @@ import (
 
 func main() {
 	cfg := config.Load() // loading the file with [file_address,workers,buffer]
+	f, err := os.Create("cpu.out")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	if err := pprof.StartCPUProfile(f); err != nil {
+		log.Fatal(err)
+	}
+	// pprof.WriteHeapProfile(f)
+	defer pprof.StopCPUProfile()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	sigCh := make(chan os.Signal, 1)
