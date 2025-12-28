@@ -25,6 +25,14 @@ func NewAggregator() *Aggregator {
 	}
 }
 
+func (a *Aggregator) Summary() model.Summary {
+	return model.Summary{
+		TotalLines:   a.totalLines,
+		LevelCount:   a.levelCount,
+		ServiceCount: a.serviceCount,
+	}
+}
+
 func (a *Aggregator) Run(ctx context.Context, in <-chan model.LogEntry) {
 	for {
 		select {
@@ -46,7 +54,7 @@ func (a *Aggregator) PrintSummary() {
 	fmt.Println()
 	printLine("=", 30)
 	fmt.Println("LOG STREAMER SUMMARY")
-	printLine("=", 30)	
+	printLine("=", 30)
 	fmt.Printf("➤  Total Lines Processed: %d\n\n", a.totalLines)
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', 0)
 	printSection := func(title string, data map[string]int) {
