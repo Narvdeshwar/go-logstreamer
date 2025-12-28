@@ -42,16 +42,25 @@ func (p *Pipeline) Run(ctx context.Context) {
 		workerWG.Add(1)
 		go func() {
 			defer workerWG.Done()
-			for line := range rawChan {
-				entry, err := prsr.Parse(line)
-				if err == nil {
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case line, ok := <-rawChan:
+					if !ok {
+						return
+					}
+					entry, err := prsr.Parse(line)
+					if err != nil {
+						continue
+					}
 					select {
 					case <-ctx.Done():
 						return
 					case parsedChan <- *entry:
 					}
 				}
-				_ = line
+
 			}
 		}()
 	}
