@@ -80,5 +80,7 @@ func (p *Pipeline) Run(ctx context.Context) {
 	<-aggDone
 	agg.PrintSummary()
 	elapsed := time.Since(start)
-	log.Println("Time taken", elapsed)
+	log.Println("Time taken: ", elapsed)
+	linesPerSec := float64(agg.Summary().TotalLines / int(elapsed.Seconds()))
+	log.Printf("Throughput: %.0f lines/sec\n", linesPerSec)
 }
