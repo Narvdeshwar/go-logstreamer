@@ -81,5 +81,8 @@ go tool pprof cpu.out
 top
 list <function_name>
 web
-
+```
+## To generate more that 1GB file size
+```bash
+yes "2025-01-01 INFO serviceX doing work" | head -n 50000000 > big.log
 ```
