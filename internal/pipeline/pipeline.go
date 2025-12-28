@@ -69,12 +69,11 @@ func (p *Pipeline) Run(ctx context.Context) {
 		close(parsedChan)
 	}()
 	agg := aggregator.NewAggregator()
-	agg.Run(ctx, parsedChan)
+	aggDone := make(chan struct{})
+	go func() {
+		agg.Run(ctx, parsedChan)
+		close(aggDone)
+	}()
+	<-aggDone
 	agg.PrintSummary()
-
-	// for range parsedChan{
-
-	// }
-
-	// <-ctx.Done()
 }
