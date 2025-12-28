@@ -2,7 +2,6 @@ package pipeline
 
 import (
 	"context"
-	"log"
 	"sync"
 	"time"
 
@@ -11,14 +10,16 @@ import (
 	"github.com/Narvdeshwar/go-logstreamer/internal/parser"
 	"github.com/Narvdeshwar/go-logstreamer/internal/source"
 	"github.com/Narvdeshwar/go-logstreamer/pkg/model"
+	"github.com/rs/zerolog"
 )
 
 type Pipeline struct {
 	cfg *config.Config
+	log zerolog.Logger
 }
 
-func New(cfg *config.Config) *Pipeline {
-	return &Pipeline{cfg: cfg}
+func New(cfg *config.Config, log zerolog.Logger) *Pipeline {
+	return &Pipeline{cfg: cfg, log: log}
 }
 
 func (p *Pipeline) Run(ctx context.Context) {
@@ -80,7 +81,17 @@ func (p *Pipeline) Run(ctx context.Context) {
 	<-aggDone
 	agg.PrintSummary()
 	elapsed := time.Since(start)
-	log.Println("Time taken: ", elapsed)
-	linesPerSec := float64(agg.Summary().TotalLines / int(elapsed.Seconds()))
-	log.Printf("Throughput: %.0f lines/sec\n", linesPerSec)
+	summary := agg.Summary()
+	elapsedSec := elapsed.Seconds()
+
+	var throughput float64
+	if elapsedSec > 0 {
+		throughput = float64(summary.TotalLines) / elapsedSec
+	}
+
+	p.log.Info().
+		Dur("elapsed", elapsed).
+		Float64("throughput", throughput).
+		Msg("pipeline completed")
+
 }
